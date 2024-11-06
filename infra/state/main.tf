@@ -6,6 +6,7 @@ module "s3_backend" {
   table_name  = "terraform-baby-locking"
 }
 
+# Comment this line if S3 backend is not created.
 terraform {
   backend "s3" {
     key            = "s3_state_backend/terraform.tfstate"

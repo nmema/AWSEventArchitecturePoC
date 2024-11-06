@@ -14,7 +14,7 @@ def lambda_handler(event, context):
     connection_id = event['requestContext']['connectionId']
 
     body = json.loads(event['body'])
-    number = body['number']
+    name = body['name']
 
 
     client = boto3.client(
@@ -24,7 +24,12 @@ def lambda_handler(event, context):
 
     client.post_to_connection(
         ConnectionId=connection_id,
-        Data=json.dumps({'statusCode': 200, 'body': int(number) ** 1000}),
+        Data=json.dumps(
+            {
+                'statusCode': 200,
+                'body': f'Hello {name}, you are successfully secured in this API.'
+            }
+        ),
     )
 
-    return {'statusCode': 200, 'body': 'sape'}
+    return {'statusCode': 200, 'body': 'Success'}

@@ -11,4 +11,4 @@ You need to execute `terraform init` && `terraform apply` in the folders followi
 3. `cognito/`
 4. `api/`
 
-Grab `oauth_url` & `cognito_user_password` ouputs as they are used to authenticate in Cognito.
+Grab `oauth_url` & `cognito_user_password` outputs as they are used to authenticate in Cognito.

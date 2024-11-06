@@ -17,10 +17,4 @@ resource "aws_dynamodb_table" "connections" {
     name = "ConnectionId"
     type = "S"
   }
-
-  # attribute {
-  #   name = "Status"
-  #   type = "S"
-  # }
-
 }

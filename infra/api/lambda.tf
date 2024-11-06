@@ -9,7 +9,7 @@ resource "aws_lambda_function" "lambda_connection" {
   filename      = data.archive_file.lambda_connection.output_path
   handler       = "lambda_function.lambda_handler"
   runtime       = "python3.12"
-  role          = aws_iam_role.iam_for_lambda.arn
+  role          = aws_iam_role.iam_for_lambda_apigw.arn
 
   source_code_hash = filebase64sha256(data.archive_file.lambda_connection.output_path)
 
@@ -26,7 +26,7 @@ resource "aws_lambda_function" "lambda_custom" {
   filename      = data.archive_file.lambda_custom.output_path
   handler       = "lambda_function.lambda_handler"
   runtime       = "python3.12"
-  role          = aws_iam_role.iam_for_lambda.arn
+  role          = aws_iam_role.iam_for_lambda_apigw.arn
 
   environment {
     variables = {
@@ -68,7 +68,7 @@ resource "null_resource" "package_lambda_layer" {
 resource "aws_lambda_layer_version" "dependencies_layer" {
   filename            = "${path.module}/auth_layer.zip"
   layer_name          = "dependencies_layer"
-  compatible_runtimes = ["python3.12"] # Adjust to your Lambda runtime
+  compatible_runtimes = ["python3.12"]
   source_code_hash    = filesha256("${path.module}/auth_layer.zip")
 
   depends_on = [null_resource.package_lambda_layer]
@@ -86,7 +86,7 @@ resource "aws_lambda_function" "lambda_authorizer" {
   filename      = data.archive_file.lambda_authorizer.output_path
   handler       = "lambda_function.lambda_handler"
   runtime       = "python3.12"
-  role          = aws_iam_role.iam_for_lambda.arn
+  role          = aws_iam_role.iam_for_lambda_apigw.arn
 
   layers = [aws_lambda_layer_version.dependencies_layer.arn]
 
@@ -99,5 +99,4 @@ resource "aws_lambda_function" "lambda_authorizer" {
   }
 
   source_code_hash = filebase64sha256(data.archive_file.lambda_authorizer.output_path)
-
 }

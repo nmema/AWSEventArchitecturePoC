@@ -11,14 +11,14 @@ data "aws_iam_policy_document" "assume_role" {
   }
 }
 
-resource "aws_iam_role" "iam_for_lambda" {
-  name               = "TerraformLambdaRole"
+resource "aws_iam_role" "iam_for_lambda_apigw" {
+  name               = "TerraformLambdaRoutesRole"
   assume_role_policy = data.aws_iam_policy_document.assume_role.json
 }
 
 resource "aws_iam_role_policy" "lambda_dynamodb_api_policy" {
   name = "TerraformLambdaPolicy"
-  role = aws_iam_role.iam_for_lambda.id
+  role = aws_iam_role.iam_for_lambda_apigw.id
   policy = jsonencode({
     "Version" : "2012-10-17",
     "Statement" : [
@@ -46,7 +46,7 @@ resource "aws_iam_role_policy" "lambda_dynamodb_api_policy" {
 }
 
 resource "aws_iam_role_policy_attachment" "lambda_basic_execution" {
-  role       = aws_iam_role.iam_for_lambda.name
+  role       = aws_iam_role.iam_for_lambda_apigw.name
   policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
 }
 
@@ -61,7 +61,7 @@ resource "aws_iam_role_policy_attachment" "lambda_basic_execution_cognito" {
 }
 
 resource "aws_iam_role_policy" "lambda_cognito_api_policy" {
-  name = "TerraformCognitoPolicy"
+  name = "TerraformLambdaCognitoPolicy"
   role = aws_iam_role.iam_for_lambda_cognito.id
   policy = jsonencode({
     Version = "2012-10-17"
@@ -79,7 +79,7 @@ resource "aws_iam_role_policy" "lambda_cognito_api_policy" {
 }
 
 resource "aws_lambda_permission" "allow_gw_connection" {
-  statement_id  = "AllowExecutionFromAPIGateway"
+  statement_id  = "AllowConnectionRoutesFromAPIGateway"
   action        = "lambda:InvokeFunction"
   function_name = aws_lambda_function.lambda_connection.function_name
   principal     = "apigateway.amazonaws.com"
@@ -88,7 +88,7 @@ resource "aws_lambda_permission" "allow_gw_connection" {
 }
 
 resource "aws_lambda_permission" "allow_gw_custom" {
-  statement_id  = "AllowExecutionFromAPIGateway"
+  statement_id  = "AllowCustomRouteFromAPIGateway"
   action        = "lambda:InvokeFunction"
   function_name = aws_lambda_function.lambda_custom.function_name
   principal     = "apigateway.amazonaws.com"
@@ -97,11 +97,10 @@ resource "aws_lambda_permission" "allow_gw_custom" {
 }
 
 resource "aws_lambda_permission" "allow_gw_authorizer" {
-  statement_id  = "AllowExecutionFromAPIGateway"
+  statement_id  = "AllowAuthorizerFromAPIGateway"
   action        = "lambda:InvokeFunction"
   function_name = aws_lambda_function.lambda_authorizer.function_name
   principal     = "apigateway.amazonaws.com"
 
   source_arn = "${aws_apigatewayv2_api.api.execution_arn}/*"
 }
-
